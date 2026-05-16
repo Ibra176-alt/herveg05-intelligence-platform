@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HERVeg.05 executive agricultural intelligence platform." />
+  <title>HERVeg.05 Intelligence Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
+  <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to dashboard</a>
+
+  <div id="loading-overlay" class="loading-overlay" aria-live="polite">
+    <section class="loader-card" aria-label="Loading dashboard">
+      <div class="brand-mark large" aria-hidden="true">H</div>
+      <div>
+        <p class="eyebrow">HERVeg.05</p>
+        <h1>Preparing intelligence workspace</h1>
+      </div>
+      <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
+      <p class="muted" id="loader-status">Connecting to Google Sheets...</p>
+    </section>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="HERVeg.05 Intelligence Platform">
+      <span class="brand-mark" aria-hidden="true">H</span>
+      <span class="brand-text">
+        <strong>HERVeg.05</strong>
+        <small>Intelligence Platform</small>
+      </span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <button class="nav-tab active" type="button" data-tab="overview">Overview</button>
+      <button class="nav-tab" type="button" data-tab="enrollment">Enrollment</button>
+      <button class="nav-tab" type="button" data-tab="payment">Payments</button>
+      <button class="nav-tab" type="button" data-tab="delivery">Delivery</button>
+      <button class="nav-tab" type="button" data-tab="geo">Geography</button>
+      <button class="nav-tab" type="button" data-tab="pipeline">Pipeline</button>
+      <button class="nav-tab" type="button" data-tab="strategy">Strategic</button>
+    </nav>
+
+    <div class="topbar-actions">
+      <div class="freshness" aria-live="polite">
+        <span id="sync-dot" class="status-dot" aria-hidden="true"></span>
+        <span id="last-updated-txt">Loading</span>
+      </div>
+      <button id="filter-toggle" class="utility-button" type="button" aria-expanded="true" aria-controls="filter-panel">Filters</button>
+      <button id="refresh-btn" class="utility-button" type="button">Refresh</button>
+      <button id="theme-btn" class="utility-button" type="button">Dark</button>
+      <button id="export-btn" class="utility-button" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+    </div>
+  </header>
+
+  <aside id="filter-panel" class="filter-panel open" aria-label="Dashboard filters">
+    <div class="filter-header">
+      <div>
+        <p class="eyebrow">Analysis Scope</p>
+        <h2>Filters</h2>
+      </div>
+      <button id="clear-filters-btn" class="text-button" type="button">Clear all</button>
+    </div>
+    <div class="filter-grid">
+      <label><span>From</span><select id="f-date-from"></select></label>
+      <label><span>To</span><select id="f-date-to"></select></label>
+      <label><span>Zone</span><select id="f-zone"></select></label>
+      <label><span>Village</span><select id="f-village"></select></label>
+      <label><span>VANO</span><select id="f-vano"></select></label>
+      <label><span>Package</span><select id="f-package"></select></label>
+      <label>
+        <span>Gender</span>
+        <select id="f-gender">
+          <option value="">All genders</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+        </select>
+      </label>
+    </div>
+  </aside>
+
+  <div id="export-menu" class="export-menu" role="menu" hidden>
+    <button type="button" role="menuitem" data-export="csv">Export farmers CSV</button>
+    <button type="button" role="menuitem" data-export="excel">Export Excel workbook</button>
+    <button type="button" role="menuitem" data-export="png">Export dashboard PNG</button>
+  </div>
+
+  <main id="main" tabindex="-1">
+    <section id="tab-overview" class="tab-page active" aria-labelledby="overview-title">
+      <div class="page-hero">
+        <div>
+          <p class="eyebrow">Executive Overview</p>
+          <h1 id="overview-title">What is happening, why it matters, and where to act.</h1>
+          <p id="overview-narrative" class="hero-copy">Loading executive summary...</p>
+        </div>
+        <aside class="health-card" aria-label="Program health score">
+          <span>Program Health</span>
+          <strong id="overview-health-score">--</strong>
+          <small id="overview-health-label">Calculating</small>
+        </aside>
+      </div>
+
+      <div id="overview-kpis" class="metric-grid priority"></div>
+
+      <div class="editorial-grid">
+        <article class="panel span-7">
+          <header class="panel-header"><div><p class="panel-kicker">Momentum</p><h2>Enrollment Trend</h2></div></header>
+          <div id="ov-enrollment-trend" class="chart"></div>
+        </article>
+        <article class="panel span-5">
+          <header class="panel-header"><div><p class="panel-kicker">Inclusion</p><h2>Gender Balance</h2></div></header>
+          <div id="ov-gender-chart" class="chart"></div>
+        </article>
+        <article class="panel span-6">
+          <header class="panel-header"><div><p class="panel-kicker">Revenue</p><h2>Revenue by Zone</h2></div></header>
+          <div id="ov-revenue-zone" class="chart"></div>
+        </article>
+        <article class="panel span-6">
+          <header class="panel-header"><div><p class="panel-kicker">Demand</p><h2>Package Distribution</h2></div></header>
+          <div id="ov-package-chart" class="chart"></div>
+        </article>
+      </div>
+      <section id="overview-insights" class="insight-grid" aria-label="Executive insights"></section>
+    </section>
+
+    <section id="tab-enrollment" class="tab-page" aria-labelledby="enrollment-title">
+      <div class="section-heading">
+        <p class="eyebrow">Enrollment Intelligence</p>
+        <h1 id="enrollment-title">Growth, inclusion, and field performance.</h1>
+        <p>Identify where outreach is working and where leadership should intervene.</p>
+      </div>
+      <div id="enr-kpis" class="metric-grid"></div>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Velocity</p><h2>Monthly Enrollment</h2></div></header><div id="enr-velocity" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Field Team</p><h2>VANO Performance</h2></div></header><div id="enr-vano" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Demand</p><h2>Package Demand</h2></div></header><div id="enr-package" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Equity</p><h2>Inclusion Radar</h2></div></header><div id="enr-equity-radar" class="chart"></div></article>
+      </div>
+      <section id="enr-insights" class="insight-grid"></section>
+    </section>
+
+    <section id="tab-payment" class="tab-page" aria-labelledby="payment-title">
+      <div class="section-heading">
+        <p class="eyebrow">Payment Intelligence</p>
+        <h1 id="payment-title">Revenue health and collection discipline.</h1>
+        <p>Track cash flow, accountability, and farmer economic participation.</p>
+      </div>
+      <div id="pay-kpis" class="metric-grid"></div>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Collections</p><h2>Revenue by Zone</h2></div></header><div id="pay-zone-revenue" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Payment Quality</p><h2>Collection Distribution</h2></div></header><div id="pay-collection-dist" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Accountability</p><h2>Agent Revenue Leaderboard</h2></div></header><div id="pay-agent-leaderboard" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Cash Flow</p><h2>Cumulative Revenue</h2></div></header><div id="pay-cumulative" class="chart"></div></article>
+      </div>
+      <section id="pay-insights" class="insight-grid"></section>
+    </section>
+
+    <section id="tab-delivery" class="tab-page" aria-labelledby="delivery-title">
+      <div class="section-heading">
+        <p class="eyebrow">Delivery Intelligence</p>
+        <h1 id="delivery-title">Operational efficiency and farmer experience.</h1>
+        <p>Understand fulfillment speed, regional coverage, and satisfaction quality.</p>
+      </div>
+      <div id="del-kpis" class="metric-grid"></div>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Throughput</p><h2>Delivery Growth</h2></div></header><div id="del-growth" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Coverage</p><h2>Delivery by Zone</h2></div></header><div id="del-zone-coverage" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Speed</p><h2>Enrollment to Delivery</h2></div></header><div id="del-timeline" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Satisfaction</p><h2>NSP Score by Zone</h2></div></header><div id="del-nsp-dist" class="chart"></div></article>
+      </div>
+      <section id="del-insights" class="insight-grid"></section>
+    </section>
+
+    <section id="tab-geo" class="tab-page" aria-labelledby="geo-title">
+      <div class="section-heading">
+        <p class="eyebrow">Geographic Intelligence</p>
+        <h1 id="geo-title">Where the program is concentrated and where to expand.</h1>
+        <p>Spatial intelligence for territory planning, VANO allocation, and village targeting.</p>
+      </div>
+      <div id="geo-kpis" class="metric-grid"></div>
+      <article class="panel map-panel">
+        <header class="panel-header">
+          <div><p class="panel-kicker">Strategic Map</p><h2>Farmer Distribution</h2></div>
+          <div class="segmented-control" aria-label="Map mode">
+            <button type="button" class="active" data-map-mode="clusters">Clusters</button>
+            <button type="button" data-map-mode="heat">Heat</button>
+            <button type="button" data-map-mode="zones">Zones</button>
+          </div>
+        </header>
+        <div id="geo-map"></div>
+        <div id="map-legend" class="map-legend"></div>
+      </article>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Penetration</p><h2>Zone Enrollment</h2></div></header><div id="geo-zone-penetration" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Village Density</p><h2>Top Villages</h2></div></header><div id="geo-village-density" class="chart"></div></article>
+      </div>
+      <section id="geo-insights" class="insight-grid"></section>
+    </section>
+
+    <section id="tab-pipeline" class="tab-page" aria-labelledby="pipeline-title">
+      <div class="section-heading">
+        <p class="eyebrow">Pipeline Intelligence</p>
+        <h1 id="pipeline-title">Conversion from enrollment to delivery.</h1>
+        <p>Expose the drop-offs that matter most to cash flow and operational completion.</p>
+      </div>
+      <div id="pipe-kpis" class="metric-grid"></div>
+      <article class="panel">
+        <header class="panel-header"><div><p class="panel-kicker">Conversion Story</p><h2>Program Funnel</h2></div></header>
+        <div id="pipe-funnel-stages" class="pipeline-flow"></div>
+      </article>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Payment Conversion</p><h2>Enroll to Pay by Zone</h2></div></header><div id="pipe-zone-conversion" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Fulfillment</p><h2>Pay to Deliver by Zone</h2></div></header><div id="pipe-delivery-conversion" class="chart"></div></article>
+      </div>
+      <section id="pipe-insights" class="insight-grid"></section>
+    </section>
+
+    <section id="tab-strategy" class="tab-page" aria-labelledby="strategy-title">
+      <div class="briefing-header">
+        <p class="eyebrow">Strategic Intelligence</p>
+        <h1 id="strategy-title">Executive briefing for growth, risk, and action.</h1>
+        <p id="strategy-exec-text">Loading strategic intelligence...</p>
+      </div>
+      <div class="briefing-grid">
+        <article class="briefing-card"><h2>Key Signals</h2><div id="strategy-trends"></div></article>
+        <article class="briefing-card"><h2>Risk Alerts</h2><div id="strategy-risks"></div></article>
+      </div>
+      <div class="editorial-grid">
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Program Score</p><h2>Health Radar</h2></div></header><div id="strategy-health-radar" class="chart"></div></article>
+        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Opportunity</p><h2>Zone Matrix</h2></div></header><div id="strategy-opportunity" class="chart"></div></article>
+      </div>
+      <div class="briefing-grid">
+        <article class="briefing-card"><h2>Strategic Recommendations</h2><div id="strategy-recommendations"></div></article>
+        <article class="briefing-card"><h2>Growth Opportunities</h2><div id="strategy-opportunities"></div></article>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button class="active" type="button" data-tab="overview">Overview</button>
+    <button type="button" data-tab="enrollment">Enroll</button>
+    <button type="button" data-tab="payment">Pay</button>
+    <button type="button" data-tab="delivery">Deliver</button>
+    <button type="button" data-tab="geo">Map</button>
+    <button type="button" data-tab="pipeline">Flow</button>
+    <button type="button" data-tab="strategy">Brief</button>
+  </nav>
+</body>
+</html>
