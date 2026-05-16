@@ -8,8 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -26,71 +25,60 @@
   <a class="skip-link" href="#main">Skip to dashboard</a>
 
   <div id="loading-overlay" class="loading-overlay" aria-live="polite">
-    <section class="loader-card" aria-label="Loading dashboard">
-      <div class="brand-mark large" aria-hidden="true">H</div>
-      <div>
-        <p class="eyebrow">HERVeg.05</p>
-        <h1>Preparing intelligence workspace</h1>
-      </div>
+    <section class="loader-card">
+      <div class="loader-brandline"><span class="brand-mark large">H</span><div><p class="eyebrow">HERVeg.05</p><h1>Loading intelligence workspace</h1></div></div>
+      <div class="skeleton-stack"><span></span><span></span><span></span></div>
       <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
       <p class="muted" id="loader-status">Connecting to Google Sheets...</p>
     </section>
   </div>
 
-  <header class="topbar">
+  <aside class="sidebar" id="sidebar">
     <a class="brand" href="#" aria-label="HERVeg.05 Intelligence Platform">
-      <span class="brand-mark" aria-hidden="true">H</span>
-      <span class="brand-text">
-        <strong>HERVeg.05</strong>
-        <small>Intelligence Platform</small>
-      </span>
+      <span class="brand-mark">H</span>
+      <span class="brand-text"><strong>HERVeg.05</strong><small>Intelligence Platform</small></span>
     </a>
-
-    <nav class="desktop-nav" aria-label="Primary navigation">
-      <button class="nav-tab active" type="button" data-tab="overview">Overview</button>
-      <button class="nav-tab" type="button" data-tab="enrollment">Enrollment</button>
-      <button class="nav-tab" type="button" data-tab="payment">Payments</button>
-      <button class="nav-tab" type="button" data-tab="delivery">Delivery</button>
-      <button class="nav-tab" type="button" data-tab="geo">Geography</button>
-      <button class="nav-tab" type="button" data-tab="pipeline">Pipeline</button>
-      <button class="nav-tab" type="button" data-tab="strategy">Strategic</button>
+    <nav class="side-nav" aria-label="Primary navigation">
+      <button class="side-link active" type="button" data-tab="overview"><span>OV</span>Executive Overview</button>
+      <button class="side-link" type="button" data-tab="enrollment"><span>EN</span>Enrollment</button>
+      <button class="side-link" type="button" data-tab="payment"><span>PY</span>Payments</button>
+      <button class="side-link" type="button" data-tab="delivery"><span>DL</span>Delivery</button>
+      <button class="side-link" type="button" data-tab="geo"><span>GE</span>Geography</button>
+      <button class="side-link" type="button" data-tab="pipeline"><span>PL</span>Pipeline</button>
+      <button class="side-link" type="button" data-tab="strategy"><span>ST</span>Strategic Intelligence</button>
     </nav>
+    <div class="sidebar-footer">
+      <span class="status-dot" id="sync-dot"></span>
+      <span id="last-updated-txt">Loading</span>
+    </div>
+  </aside>
 
+  <header class="topbar">
+    <button class="mobile-menu" id="mobile-menu" type="button" aria-controls="sidebar" aria-expanded="false">Menu</button>
+    <label class="search-box">
+      <span>Search</span>
+      <input id="global-search" type="search" placeholder="Search farmers, villages, zones..." autocomplete="off" />
+    </label>
     <div class="topbar-actions">
-      <div class="freshness" aria-live="polite">
-        <span id="sync-dot" class="status-dot" aria-hidden="true"></span>
-        <span id="last-updated-txt">Loading</span>
-      </div>
       <button id="filter-toggle" class="utility-button" type="button" aria-expanded="true" aria-controls="filter-panel">Filters</button>
       <button id="refresh-btn" class="utility-button" type="button">Refresh</button>
       <button id="theme-btn" class="utility-button" type="button">Dark</button>
       <button id="export-btn" class="utility-button" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="notification-button" type="button" aria-label="Notifications"><span></span></button>
+      <div class="profile-chip"><span>HI</span><div><strong>Executive</strong><small>HERVeg.05</small></div></div>
     </div>
   </header>
 
   <aside id="filter-panel" class="filter-panel open" aria-label="Dashboard filters">
-    <div class="filter-header">
-      <div>
-        <p class="eyebrow">Analysis Scope</p>
-        <h2>Filters</h2>
-      </div>
-      <button id="clear-filters-btn" class="text-button" type="button">Clear all</button>
-    </div>
+    <div class="filter-header"><div><p class="eyebrow">Analysis Scope</p><h2>Filter portfolio</h2></div><button id="clear-filters-btn" class="text-button" type="button">Clear all</button></div>
     <div class="filter-grid">
-      <label><span>From</span><select id="f-date-from"></select></label>
-      <label><span>To</span><select id="f-date-to"></select></label>
-      <label><span>Zone</span><select id="f-zone"></select></label>
-      <label><span>Village</span><select id="f-village"></select></label>
-      <label><span>VANO</span><select id="f-vano"></select></label>
-      <label><span>Package</span><select id="f-package"></select></label>
-      <label>
-        <span>Gender</span>
-        <select id="f-gender">
-          <option value="">All genders</option>
-          <option value="Female">Female</option>
-          <option value="Male">Male</option>
-        </select>
-      </label>
+      <label class="filter-pill"><span>From</span><select id="f-date-from"></select></label>
+      <label class="filter-pill"><span>To</span><select id="f-date-to"></select></label>
+      <label class="filter-pill"><span>Zone</span><select id="f-zone"></select></label>
+      <label class="filter-pill"><span>Village</span><select id="f-village"></select></label>
+      <label class="filter-pill"><span>VANO</span><select id="f-vano"></select></label>
+      <label class="filter-pill"><span>Package</span><select id="f-package"></select></label>
+      <label class="filter-pill"><span>Gender</span><select id="f-gender"><option value="">All genders</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
     </div>
   </aside>
 
@@ -102,152 +90,120 @@
 
   <main id="main" tabindex="-1">
     <section id="tab-overview" class="tab-page active" aria-labelledby="overview-title">
-      <div class="page-hero">
-        <div>
-          <p class="eyebrow">Executive Overview</p>
-          <h1 id="overview-title">What is happening, why it matters, and where to act.</h1>
-          <p id="overview-narrative" class="hero-copy">Loading executive summary...</p>
-        </div>
-        <aside class="health-card" aria-label="Program health score">
-          <span>Program Health</span>
-          <strong id="overview-health-score">--</strong>
-          <small id="overview-health-label">Calculating</small>
-        </aside>
+      <div class="page-hero"><div><p class="eyebrow">Executive Overview</p><h1 id="overview-title">A command center for program scale, cash flow, delivery, and impact.</h1><p id="overview-narrative" class="hero-copy">Loading executive summary...</p></div><aside class="health-card"><span>Program Health</span><strong id="overview-health-score">--</strong><small id="overview-health-label">Calculating</small></aside></div>
+      <div id="overview-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Momentum</p><h2>Enrollment Trend</h2></header><div id="ov-enrollment-trend" class="chart"></div></article>
+        <article class="panel"><header><p>Inclusion</p><h2>Gender Distribution</h2></header><div id="ov-gender-chart" class="chart"></div></article>
+        <article class="panel"><header><p>Revenue</p><h2>Revenue by Zone</h2></header><div id="ov-revenue-zone" class="chart"></div></article>
+        <article class="panel"><header><p>Demand</p><h2>Package Distribution</h2></header><div id="ov-package-chart" class="chart"></div></article>
       </div>
-
-      <div id="overview-kpis" class="metric-grid priority"></div>
-
-      <div class="editorial-grid">
-        <article class="panel span-7">
-          <header class="panel-header"><div><p class="panel-kicker">Momentum</p><h2>Enrollment Trend</h2></div></header>
-          <div id="ov-enrollment-trend" class="chart"></div>
-        </article>
-        <article class="panel span-5">
-          <header class="panel-header"><div><p class="panel-kicker">Inclusion</p><h2>Gender Balance</h2></div></header>
-          <div id="ov-gender-chart" class="chart"></div>
-        </article>
-        <article class="panel span-6">
-          <header class="panel-header"><div><p class="panel-kicker">Revenue</p><h2>Revenue by Zone</h2></div></header>
-          <div id="ov-revenue-zone" class="chart"></div>
-        </article>
-        <article class="panel span-6">
-          <header class="panel-header"><div><p class="panel-kicker">Demand</p><h2>Package Distribution</h2></div></header>
-          <div id="ov-package-chart" class="chart"></div>
-        </article>
-      </div>
-      <section id="overview-insights" class="insight-grid" aria-label="Executive insights"></section>
+      <section id="overview-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-enrollment" class="tab-page" aria-labelledby="enrollment-title">
-      <div class="section-heading">
-        <p class="eyebrow">Enrollment Intelligence</p>
-        <h1 id="enrollment-title">Growth, inclusion, and field performance.</h1>
-        <p>Identify where outreach is working and where leadership should intervene.</p>
+      <div class="section-heading"><p class="eyebrow">Enrollment Intelligence</p><h1 id="enrollment-title">Growth, inclusion, geography, and field performance.</h1><p>All registration KPIs and visualizations are preserved, redesigned for executive scanning.</p></div>
+      <h2 class="group-title">Business KPIs</h2><div id="enr-biz-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Velocity</p><h2>Daily Enrollment Velocity</h2></header><div id="enr-velocity" class="chart"></div></article>
+        <article class="panel"><header><p>Inclusion</p><h2>Gender Distribution</h2></header><div id="enr-gender" class="chart"></div></article>
+        <article class="panel"><header><p>Field Team</p><h2>Field Officer Performance</h2></header><div id="enr-vano" class="chart"></div></article>
+        <article class="panel"><header><p>Demand</p><h2>Package Demand Analysis</h2></header><div id="enr-package" class="chart"></div></article>
+        <article class="panel"><header><p>Growth</p><h2>Enrollment Growth Rate</h2></header><div id="enr-growth" class="chart"></div></article>
+        <article class="panel"><header><p>Groups</p><h2>Active Group Density</h2></header><div id="enr-groups" class="chart"></div></article>
+        <article class="panel"><header><p>Geography</p><h2>Geographic Penetration by Zone</h2></header><div id="enr-zone" class="chart"></div></article>
+        <article class="panel"><header><p>Leadership</p><h2>Community Leadership Roles</h2></header><div id="enr-positions" class="chart"></div></article>
       </div>
-      <div id="enr-kpis" class="metric-grid"></div>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Velocity</p><h2>Monthly Enrollment</h2></div></header><div id="enr-velocity" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Field Team</p><h2>VANO Performance</h2></div></header><div id="enr-vano" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Demand</p><h2>Package Demand</h2></div></header><div id="enr-package" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Equity</p><h2>Inclusion Radar</h2></div></header><div id="enr-equity-radar" class="chart"></div></article>
+      <h2 class="group-title">Impact KPIs</h2><div id="enr-impact-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Nutrition</p><h2>Nutrition Exposure Funnel</h2></header><div id="enr-nutrition-funnel" class="chart"></div></article>
+        <article class="panel"><header><p>Equity</p><h2>Inclusion Equity Radar</h2></header><div id="enr-equity-radar" class="chart"></div></article>
+        <article class="panel"><header><p>Vulnerability</p><h2>Vulnerable Household Segmentation</h2></header><div id="enr-vulnerable" class="chart"></div></article>
+        <article class="panel"><header><p>Village Reach</p><h2>Village Outreach Reach</h2></header><div id="enr-villages" class="chart"></div></article>
       </div>
       <section id="enr-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-payment" class="tab-page" aria-labelledby="payment-title">
-      <div class="section-heading">
-        <p class="eyebrow">Payment Intelligence</p>
-        <h1 id="payment-title">Revenue health and collection discipline.</h1>
-        <p>Track cash flow, accountability, and farmer economic participation.</p>
+      <div class="section-heading"><p class="eyebrow">Payment Intelligence</p><h1 id="payment-title">Revenue health, accountability, and farmer economic participation.</h1><p>Every payment KPI and chart is retained in a cleaner SaaS analytics layout.</p></div>
+      <h2 class="group-title">Business KPIs</h2><div id="pay-biz-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Collections</p><h2>Revenue by Zone</h2></header><div id="pay-zone-revenue" class="chart"></div></article>
+        <article class="panel"><header><p>Payment Quality</p><h2>Collection Rate Distribution</h2></header><div id="pay-collection-dist" class="chart"></div></article>
+        <article class="panel"><header><p>Agents</p><h2>Top Village Agents by Revenue</h2></header><div id="pay-agent-leaderboard" class="chart"></div></article>
+        <article class="panel"><header><p>Demand</p><h2>Package Demand Trend</h2></header><div id="pay-package-demand" class="chart"></div></article>
+        <article class="panel"><header><p>Fulfillment</p><h2>Delivery Completion Funnel</h2></header><div id="pay-delivery-funnel" class="chart"></div></article>
+        <article class="panel"><header><p>Compliance</p><h2>Overpayment vs Underpayment</h2></header><div id="pay-payment-segments" class="chart"></div></article>
+        <article class="panel"><header><p>Adoption</p><h2>Program Adoption Growth</h2></header><div id="pay-adoption-growth" class="chart"></div></article>
+        <article class="panel"><header><p>Cash Flow</p><h2>Economic Participation Value</h2></header><div id="pay-cumulative" class="chart"></div></article>
       </div>
-      <div id="pay-kpis" class="metric-grid"></div>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Collections</p><h2>Revenue by Zone</h2></div></header><div id="pay-zone-revenue" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Payment Quality</p><h2>Collection Distribution</h2></div></header><div id="pay-collection-dist" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Accountability</p><h2>Agent Revenue Leaderboard</h2></div></header><div id="pay-agent-leaderboard" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Cash Flow</p><h2>Cumulative Revenue</h2></div></header><div id="pay-cumulative" class="chart"></div></article>
+      <h2 class="group-title">Impact KPIs</h2><div id="pay-impact-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Village Reach</p><h2>Rural Village Penetration</h2></header><div id="pay-village-reach" class="chart"></div></article>
+        <article class="panel"><header><p>Commitment</p><h2>High Commitment Farmers</h2></header><div id="pay-high-commitment" class="chart"></div></article>
       </div>
       <section id="pay-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-delivery" class="tab-page" aria-labelledby="delivery-title">
-      <div class="section-heading">
-        <p class="eyebrow">Delivery Intelligence</p>
-        <h1 id="delivery-title">Operational efficiency and farmer experience.</h1>
-        <p>Understand fulfillment speed, regional coverage, and satisfaction quality.</p>
+      <div class="section-heading"><p class="eyebrow">Delivery Intelligence</p><h1 id="delivery-title">Operational efficiency, delivery performance, and satisfaction quality.</h1><p>All delivery metrics remain available with clearer grouping and visual rhythm.</p></div>
+      <h2 class="group-title">Business KPIs</h2><div id="del-biz-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Growth</p><h2>Delivery Growth Rate</h2></header><div id="del-growth" class="chart"></div></article>
+        <article class="panel"><header><p>Packages</p><h2>Package Distribution</h2></header><div id="del-package-dist" class="chart"></div></article>
+        <article class="panel"><header><p>Coverage</p><h2>Delivery Coverage by Zone</h2></header><div id="del-zone-coverage" class="chart"></div></article>
+        <article class="panel"><header><p>Satisfaction</p><h2>NSP Score Distribution</h2></header><div id="del-nsp-dist" class="chart"></div></article>
+        <article class="panel"><header><p>Daily</p><h2>Daily Delivery Performance</h2></header><div id="del-daily" class="chart"></div></article>
+        <article class="panel"><header><p>Speed</p><h2>Enrollment-to-Delivery Timeline</h2></header><div id="del-timeline" class="chart"></div></article>
+        <article class="panel"><header><p>Equity</p><h2>Zone Equity Distribution</h2></header><div id="del-zone-equity" class="chart"></div></article>
+        <article class="panel"><header><p>Engagement</p><h2>Farmer Engagement Trend</h2></header><div id="del-engagement" class="chart"></div></article>
       </div>
-      <div id="del-kpis" class="metric-grid"></div>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Throughput</p><h2>Delivery Growth</h2></div></header><div id="del-growth" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Coverage</p><h2>Delivery by Zone</h2></div></header><div id="del-zone-coverage" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Speed</p><h2>Enrollment to Delivery</h2></div></header><div id="del-timeline" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Satisfaction</p><h2>NSP Score by Zone</h2></div></header><div id="del-nsp-dist" class="chart"></div></article>
+      <h2 class="group-title">Impact KPIs</h2><div id="del-impact-kpis" class="metric-grid five-col"></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Gender</p><h2>Gender Ratio in Deliveries</h2></header><div id="del-gender" class="chart"></div></article>
+        <article class="panel"><header><p>Village Reach</p><h2>Village Delivery Reach</h2></header><div id="del-village-reach" class="chart"></div></article>
       </div>
       <section id="del-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-geo" class="tab-page" aria-labelledby="geo-title">
-      <div class="section-heading">
-        <p class="eyebrow">Geographic Intelligence</p>
-        <h1 id="geo-title">Where the program is concentrated and where to expand.</h1>
-        <p>Spatial intelligence for territory planning, VANO allocation, and village targeting.</p>
-      </div>
-      <div id="geo-kpis" class="metric-grid"></div>
-      <article class="panel map-panel">
-        <header class="panel-header">
-          <div><p class="panel-kicker">Strategic Map</p><h2>Farmer Distribution</h2></div>
-          <div class="segmented-control" aria-label="Map mode">
-            <button type="button" class="active" data-map-mode="clusters">Clusters</button>
-            <button type="button" data-map-mode="heat">Heat</button>
-            <button type="button" data-map-mode="zones">Zones</button>
-          </div>
-        </header>
-        <div id="geo-map"></div>
-        <div id="map-legend" class="map-legend"></div>
-      </article>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Penetration</p><h2>Zone Enrollment</h2></div></header><div id="geo-zone-penetration" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Village Density</p><h2>Top Villages</h2></div></header><div id="geo-village-density" class="chart"></div></article>
+      <div class="section-heading"><p class="eyebrow">Geographic Intelligence</p><h1 id="geo-title">Spatial farmer distribution and strategic territory planning.</h1><p>The map remains dominant while all supporting geographic charts are preserved.</p></div>
+      <div id="geo-kpis" class="metric-grid five-col"></div>
+      <article class="panel map-panel"><header><div><p>Strategic Map</p><h2>Farmer Geographic Distribution</h2></div><div class="segmented-control"><button type="button" class="active" data-map-mode="clusters">Clusters</button><button type="button" data-map-mode="heat">Heat</button><button type="button" data-map-mode="zones">Zones</button></div></header><div id="geo-map"></div><div id="map-legend" class="map-legend"></div></article>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Penetration</p><h2>Zone Penetration Analysis</h2></header><div id="geo-zone-penetration" class="chart"></div></article>
+        <article class="panel"><header><p>Villages</p><h2>Top Villages by Enrollment</h2></header><div id="geo-village-density" class="chart"></div></article>
+        <article class="panel"><header><p>VANO</p><h2>VANO Territory Coverage</h2></header><div id="geo-vano-coverage" class="chart"></div></article>
+        <article class="panel"><header><p>Gender</p><h2>Zone x Gender Matrix</h2></header><div id="geo-gender-zone" class="chart"></div></article>
+        <article class="panel"><header><p>Demand</p><h2>Package Preference by Zone</h2></header><div id="geo-package-zone" class="chart"></div></article>
+        <article class="panel"><header><p>Reach</p><h2>Household Size by Zone</h2></header><div id="geo-hh-zone" class="chart"></div></article>
       </div>
       <section id="geo-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-pipeline" class="tab-page" aria-labelledby="pipeline-title">
-      <div class="section-heading">
-        <p class="eyebrow">Pipeline Intelligence</p>
-        <h1 id="pipeline-title">Conversion from enrollment to delivery.</h1>
-        <p>Expose the drop-offs that matter most to cash flow and operational completion.</p>
-      </div>
-      <div id="pipe-kpis" class="metric-grid"></div>
-      <article class="panel">
-        <header class="panel-header"><div><p class="panel-kicker">Conversion Story</p><h2>Program Funnel</h2></div></header>
-        <div id="pipe-funnel-stages" class="pipeline-flow"></div>
-      </article>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Payment Conversion</p><h2>Enroll to Pay by Zone</h2></div></header><div id="pipe-zone-conversion" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Fulfillment</p><h2>Pay to Deliver by Zone</h2></div></header><div id="pipe-delivery-conversion" class="chart"></div></article>
+      <div class="section-heading"><p class="eyebrow">Pipeline Intelligence</p><h1 id="pipeline-title">Enrollment to payment to delivery conversion.</h1><p>All conversion metrics and visualizations retained for operational accountability.</p></div>
+      <div id="pipe-kpis" class="metric-grid five-col"></div>
+      <article class="panel"><header><p>Conversion Story</p><h2>Program Conversion Funnel</h2></header><div id="pipe-funnel-stages" class="pipeline-flow"></div></article>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Payment</p><h2>Enrollment to Payment Rate by Zone</h2></header><div id="pipe-zone-conversion" class="chart"></div></article>
+        <article class="panel"><header><p>Fulfillment</p><h2>Payment to Delivery Completion by Zone</h2></header><div id="pipe-delivery-conversion" class="chart"></div></article>
+        <article class="panel"><header><p>Velocity</p><h2>Monthly Conversion Velocity</h2></header><div id="pipe-velocity" class="chart"></div></article>
+        <article class="panel"><header><p>Packages</p><h2>Package Conversion Rate</h2></header><div id="pipe-package-conversion" class="chart"></div></article>
       </div>
       <section id="pipe-insights" class="insight-grid"></section>
     </section>
 
     <section id="tab-strategy" class="tab-page" aria-labelledby="strategy-title">
-      <div class="briefing-header">
-        <p class="eyebrow">Strategic Intelligence</p>
-        <h1 id="strategy-title">Executive briefing for growth, risk, and action.</h1>
-        <p id="strategy-exec-text">Loading strategic intelligence...</p>
+      <div class="briefing-header"><p class="eyebrow">Strategic Intelligence</p><h1 id="strategy-title">Executive briefing for growth, risk, and action.</h1><p id="strategy-exec-text">Loading strategic intelligence...</p></div>
+      <div class="briefing-grid"><article class="briefing-card"><h2>Key Signals</h2><div id="strategy-trends"></div></article><article class="briefing-card"><h2>Risk Alerts</h2><div id="strategy-risks"></div></article></div>
+      <div class="chart-grid">
+        <article class="panel"><header><p>Program Score</p><h2>Program Health Score</h2></header><div id="strategy-health-radar" class="chart"></div></article>
+        <article class="panel"><header><p>Anomalies</p><h2>Performance Anomaly Detection</h2></header><div id="strategy-anomaly" class="chart"></div></article>
+        <article class="panel"><header><p>Opportunity</p><h2>Growth Opportunity Matrix</h2></header><div id="strategy-opportunity" class="chart"></div></article>
+        <article class="panel"><header><p>Trend</p><h2>Multi-Dimensional KPI Trend</h2></header><div id="strategy-trend-comparison" class="chart"></div></article>
       </div>
-      <div class="briefing-grid">
-        <article class="briefing-card"><h2>Key Signals</h2><div id="strategy-trends"></div></article>
-        <article class="briefing-card"><h2>Risk Alerts</h2><div id="strategy-risks"></div></article>
-      </div>
-      <div class="editorial-grid">
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Program Score</p><h2>Health Radar</h2></div></header><div id="strategy-health-radar" class="chart"></div></article>
-        <article class="panel span-6"><header class="panel-header"><div><p class="panel-kicker">Opportunity</p><h2>Zone Matrix</h2></div></header><div id="strategy-opportunity" class="chart"></div></article>
-      </div>
-      <div class="briefing-grid">
-        <article class="briefing-card"><h2>Strategic Recommendations</h2><div id="strategy-recommendations"></div></article>
-        <article class="briefing-card"><h2>Growth Opportunities</h2><div id="strategy-opportunities"></div></article>
-      </div>
+      <div class="briefing-grid"><article class="briefing-card"><h2>Strategic Recommendations</h2><div id="strategy-recommendations"></div></article><article class="briefing-card"><h2>Growth Opportunities</h2><div id="strategy-opportunities"></div></article></div>
     </section>
   </main>
 
